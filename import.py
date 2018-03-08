@@ -186,7 +186,11 @@ def main():
         map_entry = stats_map[uuid]
 
         measurement = map_entry["measurement"]
-        tags = map_entry["tags"]
+
+        if "tags" in map_entry:
+            tags = map_entry["tags"]
+        else:
+            tags = None
 
         logger.info("Writing values into measurement '{}' with tags {}".format(measurement, tags))
 
