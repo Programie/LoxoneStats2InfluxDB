@@ -1,3 +1,4 @@
 argcomplete
 influxdb
 requests
+terminaltables

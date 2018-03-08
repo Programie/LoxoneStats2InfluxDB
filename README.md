@@ -8,6 +8,7 @@ This script reads the statistics collected by the Loxone Miniserver and writes t
    * [Argcomplete](https://pypi.python.org/pypi/argcomplete) (optional) : `pip3 install argcomplete`
    * [InfluxDB-Python](https://github.com/influxdata/influxdb-python): `pip3 install influxdb`
    * [Requests](https://github.com/requests/requests): `pip3 install requests`
+   * [terminaltables](https://github.com/Robpol86/terminaltables) (optional): `pip3 install terminaltables`
 * Loxone Miniserver
 * InfluxDB
 
@@ -23,4 +24,6 @@ In the `stats_map` you have to map each UUID of the statistics to a measurement 
 
 ## Usage
 
-Just execute `python3 import.py`.
+As you might not know the UUIDs of the stats, you can list all available statistics including their UUID and name. To do that just execute `python3 import.py --list`.
+
+Without any arguments, the script will start to import the statistics configured in the configuration file: Just execute `python3 import.py`

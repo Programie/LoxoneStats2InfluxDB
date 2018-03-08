@@ -11,6 +11,11 @@ from xml.etree import ElementTree
 from influxdb import InfluxDBClient
 
 try:
+    from terminaltables import SingleTable
+except ImportError:
+    SingleTable = None
+
+try:
     import argcomplete
 except ImportError:
     argcomplete = None
@@ -40,18 +45,22 @@ def miniserver_request(config, path):
 
 
 def get_files(miniserver_config):
-    files = []
+    files = {}
 
     html = miniserver_request(miniserver_config, "stats/").text.split("\n")
 
     for line in html:
-        match = re.search('<a href="(.*)">.*</a>', line)
+        match = re.search('<a href="(.*)">(.*)</a>', line)
         if not match:
             continue
 
-        files.append(match.group(1))
+        files[match.group(1)] = match.group(2)
 
     return files
+
+
+def get_uuid_from_filename(filename):
+    return re.search("([a-f0-9\-]+)", filename).group(1)
 
 
 def import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags):
@@ -95,6 +104,7 @@ def main():
     argument_parser = argparse.ArgumentParser(description="Import statistics from Loxone Miniserver into InfluxDB")
 
     argument_parser.add_argument("--config", "-c", help="the configuration file to use (default: config.json)", default="config.json")
+    argument_parser.add_argument("--list", "-l", action="store_true", help="only list stats files")
     argument_parser.add_argument("--quiet", "-q", action="store_true", help="only output warnings and errors")
     argument_parser.add_argument("--verbose", "-v", action="store_true", help="be more verbose")
 
@@ -132,18 +142,42 @@ def main():
     influxdb_config = config["influxdb"]
     stats_map = config["stats_map"]
 
-    influxdb_client = InfluxDBClient(influxdb_config["host"], influxdb_config["port"], influxdb_config["username"], influxdb_config["password"], influxdb_config["database"])
-
     logger.info("Getting list of stats files from Miniserver")
 
     files = get_files(miniserver_config)
 
     logger.info("{} stats files to import".format(len(files)))
 
-    for filename in files:
-        uuid = re.search("([a-f0-9\-]+)", filename).group(1)
+    if arguments.list:
+        unique_stats = {}
 
+        for filename, title in files.items():
+            unique_stats[get_uuid_from_filename(filename)] = title
+
+        list = []
+
+        for uuid, title in unique_stats.items():
+            list.append([uuid, re.search("(.*) [0-9]+$", title).group(1)])
+
+        if SingleTable:
+            table_rows = [
+                ["UUID", "Name"]
+            ]
+
+            # noinspection PyCallingNonCallable
+            print(SingleTable(table_rows + list).table)
+        else:
+            for line in list:
+                print("\t".join(line))
+
+        return
+
+    influxdb_client = InfluxDBClient(influxdb_config["host"], influxdb_config["port"], influxdb_config["username"], influxdb_config["password"], influxdb_config["database"])
+
+    for filename, title in files.items():
         logger.info("Next file: {}".format(filename))
+
+        uuid = get_uuid_from_filename(filename)
 
         if uuid not in stats_map:
             logger.warning("UUID {} not mapped, skipping".format(uuid))
