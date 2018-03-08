@@ -19,7 +19,7 @@ Just copy [config.sample.json](config.sample.json) to `config.json` and edit it 
 
 The `influxdb` and `miniserver` configuration should be self explaining: It configures the connection to the InfluxDB and your Loxone Miniserver.
 
-In the `stats_map` you have to map each room ID to a measurement and (optional) tags.
+In the `stats_map` you have to map each UUID of the statistics to a measurement and (optional) tags.
 
 ## Usage
 

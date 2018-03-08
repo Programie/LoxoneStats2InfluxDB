@@ -141,15 +141,15 @@ def main():
     logger.info("{} stats files to import".format(len(files)))
 
     for filename in files:
-        room_id = re.search("([a-f0-9\-]+)", filename).group(1)
+        uuid = re.search("([a-f0-9\-]+)", filename).group(1)
 
         logger.info("Next file: {}".format(filename))
 
-        if room_id not in stats_map:
-            logger.warning("Room ID {} not mapped, skipping".format(room_id))
+        if uuid not in stats_map:
+            logger.warning("UUID {} not mapped, skipping".format(uuid))
             continue
 
-        map_entry = stats_map[room_id]
+        map_entry = stats_map[uuid]
 
         measurement = map_entry["measurement"]
         tags = map_entry["tags"]
