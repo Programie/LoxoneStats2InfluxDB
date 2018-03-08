@@ -1,0 +1,40 @@
+{
+  "influxdb": {
+    "host": "localhost",
+    "port": 8086,
+    "username": "root",
+    "password": "root",
+    "database": "loxone"
+  },
+  "miniserver": {
+    "host": "your.miniserver.host",
+    "username": "your-miniserver-user",
+    "password": "your-miniserver-password"
+  },
+  "stats_map": {
+    "0bc5a5bd-02fb-6e69-ffff504f94000000": {
+      "measurement": "Temperature",
+      "tags": {
+        "room": "Living room"
+      }
+    },
+    "0bc5a5c5-02ca-76fa-ffff504f94000000": {
+      "measurement": "Temperature",
+      "tags": {
+        "room": "Kitchen"
+      }
+    },
+    "0bc5a5c8-014d-7f8f-ffff504f94000000": {
+      "measurement": "Temperature",
+      "tags": {
+        "room": "Bathroom"
+      }
+    },
+    "0bc5a5cb-0384-8828-ffff504f94000000": {
+      "measurement": "Temperature",
+      "tags": {
+        "room": "Bedroom"
+      }
+    }
+  }
+}
