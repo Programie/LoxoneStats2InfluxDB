@@ -63,7 +63,7 @@ def get_uuid_from_filename(filename):
     return re.search("([a-f0-9\-]+)", filename).group(1)
 
 
-def import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags):
+def import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags, value_map):
     try:
         request = miniserver_request(miniserver_config, "stats/{}".format(filename))
         tree = ElementTree.fromstring(request.content)
@@ -72,19 +72,23 @@ def import_stats(logger, filename, miniserver_config, influxdb_client, measureme
 
         for stat in tree.iter("S"):
             time_string = stat.get("T")
-            value_string = stat.get("V")
 
             time_string = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            logger.debug("Adding value {} with time {}".format(value_string, time_string))
+            fields = {}
+
+            for attribute, field in value_map.items():
+                value = float(stat.get(attribute))
+
+                logger.debug("Adding value {} from attribute '{}' to field '{}' with time {}".format(value, attribute, field, time_string))
+
+                fields[field] = value
 
             points.append({
                 "measurement": measurement,
                 "tags": tags,
                 "time": time_string,
-                "fields": {
-                    "value": float(value_string)
-                }
+                "fields": fields
             })
 
         influxdb_client.write_points(points)
@@ -97,7 +101,7 @@ def import_stats(logger, filename, miniserver_config, influxdb_client, measureme
 
         time.sleep(10)
 
-        import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags)
+        import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags, value_map)
 
 
 def main():
@@ -192,9 +196,16 @@ def main():
         else:
             tags = None
 
+        if "values" in map_entry:
+            value_map = map_entry["values"]
+        else:
+            value_map = {
+                "V": "value"
+            }
+
         logger.info("Writing values into measurement '{}' with tags {}".format(measurement, tags))
 
-        import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags)
+        import_stats(logger, filename, miniserver_config, influxdb_client, measurement, tags, value_map)
 
 
 if __name__ == "__main__":

@@ -35,6 +35,13 @@
       "tags": {
         "room": "Bedroom"
       }
+    },
+    "0bc9716e-027e-9276-ffff504f94000000": {
+      "measurement": "Power",
+      "values": {
+        "V": "Total",
+        "V2": "Current"
+      }
     }
   }
 }
