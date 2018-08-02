@@ -157,10 +157,10 @@ def main():
         for filename, title in files.items():
             unique_stats[get_uuid_from_filename(filename)] = title
 
-        list = []
+        stats_list = []
 
         for uuid, title in unique_stats.items():
-            list.append([uuid, re.search("(.*) [0-9]+$", title).group(1)])
+            stats_list.append([uuid, re.search("(.*) [0-9]+$", title).group(1)])
 
         if SingleTable:
             table_rows = [
@@ -168,9 +168,9 @@ def main():
             ]
 
             # noinspection PyCallingNonCallable
-            print(SingleTable(table_rows + list).table)
+            print(SingleTable(table_rows + stats_list).table)
         else:
-            for line in list:
+            for line in stats_list:
                 print("\t".join(line))
 
         return
