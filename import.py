@@ -6,7 +6,6 @@ import re
 import requests
 import sys
 import time
-from datetime import datetime
 from xml.etree import ElementTree
 from influxdb import InfluxDBClient
 
@@ -73,7 +72,7 @@ def import_stats(logger, filename, miniserver_config, influxdb_client, measureme
         for stat in tree.iter("S"):
             time_string = stat.get("T")
 
-            time_string = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%dT%H:%M:%SZ")
+            time_string = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.mktime(time.strptime(time_string, "%Y-%m-%d %H:%M:%S"))))
 
             fields = {}
 
